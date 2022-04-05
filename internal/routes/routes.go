@@ -3,7 +3,8 @@ package routes
 import (
 	"net/http"
 
-	"github.com/bdkamenov/gameserver/internal/users/service"
+	usersService "github.com/bdkamenov/gameserver/internal/users/service"
+	"github.com/gorilla/mux"
 )
 
 // CommonMiddleware --Set content-type
@@ -17,9 +18,17 @@ func CommonMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-func Handlers() {
-	usersHandler := http.HandlerFunc(service.HandleUsers)
-	userHandler := http.HandlerFunc(service.HandleUser)
-	http.Handle("/users", CommonMiddleware(usersHandler))
-	http.Handle("/user/", CommonMiddleware(userHandler))
+func Handlers() *mux.Router {
+
+	r := mux.NewRouter().StrictSlash(true)
+
+	r.Use(CommonMiddleware)
+
+	r.HandleFunc("/register", usersService.CreateUser).Methods("POST")
+	//r.HandleFunc("/login", usersService.Login).Methods("POST")
+	r.HandleFunc("/user", usersService.FetchUsers).Methods("GET")
+	r.HandleFunc("/user/{id}", usersService.GetUser).Methods("GET")
+	r.HandleFunc("/user/{id}", usersService.UpdateUser).Methods("PUT")
+	r.HandleFunc("/user/{id}", usersService.DeleteUser).Methods("DELETE")
+	return r
 }

@@ -10,9 +10,9 @@ import (
 func main() {
 
 	// Handle routes
-	routes.Handlers()
+	r := routes.Handlers()
 
-	err := http.ListenAndServe(":5000", nil)
+	err := http.ListenAndServe(":5000", r)
 	if err != nil {
 		log.Fatal(err)
 	}
